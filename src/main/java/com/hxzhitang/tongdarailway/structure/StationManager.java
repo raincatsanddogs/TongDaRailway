@@ -39,7 +39,7 @@ public class StationManager {
             return null;
         }
 
-        return MyRandom.getRandomValueFromMap(normalStation, seed*10000);
+        return MyRandom.getRandomValueFromMap(normalStation, 84_269 + seed*10000);
     }
 
     public static StationStructure getRandomUnderGroundStation(long seed) {
@@ -47,7 +47,7 @@ public class StationManager {
             return null;
         }
 
-        return MyRandom.getRandomValueFromMap(undergroundStation, seed*10000);
+        return MyRandom.getRandomValueFromMap(undergroundStation, 71_1551 + seed*10000);
     }
 
     private static class NBTResourceReloadListener extends SimplePreparableReloadListener<Map<ResourceLocation, CompoundTag>> {
