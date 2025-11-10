@@ -149,7 +149,7 @@ public class StationPlanner {
     private static int[] getConnectStart(BlockPos exitPos, Vec3 dir, Vec3 offset, Vec3 exitDir) {
         Vec3 pos = Vec3.atCenterOf(exitPos);
 //        Vec3 addOff = offset.normalize().scale(30);
-        Vec3 addOff = exitDir.scale(15);
+        Vec3 addOff = exitDir.scale(30);
         Vec3 start = pos.add(dir.scale(15).add(addOff));
         // 最后的y尽量确保出站线和出站口在同高度
         return new int[] {(int) start.x, (int) start.z, exitPos.getY()};

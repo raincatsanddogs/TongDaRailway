@@ -53,7 +53,7 @@ public class TrackSpawnerBlockEntity extends BlockEntity {
                             placeCurveTrackEntity(world, track);
                         });
                     } else {
-                        if (!world.getBlockState(track.pos()).equals(AllBlocks.TRACK.getDefaultState())) {
+                        if (!world.getBlockState(track.pos()).is(AllBlocks.TRACK)) {
                             BlockState trackState = AllBlocks.TRACK.getDefaultState()
                                     .setValue(TrackBlock.SHAPE, track.shape())
                                     .setValue(TrackBlock.HAS_BE, true);

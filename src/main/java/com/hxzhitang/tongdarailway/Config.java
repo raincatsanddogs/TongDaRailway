@@ -1,7 +1,5 @@
 package com.hxzhitang.tongdarailway;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -21,14 +19,20 @@ public class Config {
             .comment("Can the track spawner be generated")
             .define("generateTrackSpawner", true);
 
+    private static final ModConfigSpec.BooleanValue PLACE_TRACKS_USING_TRACK_SPAWNER = BUILDER
+            .comment("Use the track spawner,(true) or place rails during world generation.(false)")
+            .define("placeTracksUsingTrackSpawner", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean enableTrackSpawner;
     public static boolean generateTrackSpawner;
+    public static boolean useTrackSpawnerPlaceTrack;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         enableTrackSpawner = ENABLE_TRACK_SPAWNER.get();
         generateTrackSpawner = GENERATE_TRACK_SPAWNER.get();
+        useTrackSpawnerPlaceTrack = PLACE_TRACKS_USING_TRACK_SPAWNER.get();
     }
 }

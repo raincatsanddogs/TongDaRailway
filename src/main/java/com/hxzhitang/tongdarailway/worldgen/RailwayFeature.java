@@ -1,7 +1,10 @@
 package com.hxzhitang.tongdarailway.worldgen;
 
+import com.hxzhitang.tongdarailway.Config;
 import com.hxzhitang.tongdarailway.Tongdarailway;
 import com.hxzhitang.tongdarailway.blocks.ITrackPreGenExtension;
+import com.hxzhitang.tongdarailway.blocks.ModBlocks;
+import com.hxzhitang.tongdarailway.blocks.TrackSpawnerBlockEntity;
 import com.hxzhitang.tongdarailway.railway.RailwayBuilder;
 import com.hxzhitang.tongdarailway.railway.RailwayMap;
 import com.hxzhitang.tongdarailway.railway.RegionPos;
@@ -64,38 +67,41 @@ public class RailwayFeature extends Feature<RailwayFeatureConfig> {
 
         // 放置铁轨刷怪笼
         // 也许机械动力铁轨天然厌恶生成时放置，我只能用这种愚蠢的方法了
-        /*if (Config.generateTrackSpawner) {
-            if (builder.regionRailways.containsKey(regionPos)) {
-                if (railwayMap.trackMap.containsKey(cPos)) {
-                    var firstInfo = railwayMap.trackMap.get(cPos).getFirst();
-                    BlockPos checkPos = firstInfo.pos().offset(0, -1, 0);
-                    if (!world.getBlockState(checkPos).equals(ModBlocks.TRACK_SPAWNER.get().defaultBlockState())) {
-                        world.setBlock(checkPos, ModBlocks.TRACK_SPAWNER.get().defaultBlockState(), 3);
+        if (Config.useTrackSpawnerPlaceTrack && Config.generateTrackSpawner) {
+                if (builder.regionRailways.containsKey(regionPos)) {
+                    if (railwayMap.trackMap.containsKey(cPos)) {
+                        var firstInfo = railwayMap.trackMap.get(cPos).getFirst();
+                        BlockPos checkPos = firstInfo.pos().offset(0, -1, 0);
+                        if (!world.getBlockState(checkPos).is(ModBlocks.TRACK_SPAWNER.get())) {
+                            world.setBlock(checkPos, ModBlocks.TRACK_SPAWNER.get().defaultBlockState(), 3);
+                        }
                         if (world.getBlockEntity(checkPos) instanceof TrackSpawnerBlockEntity trackSpawner) {
                             trackSpawner.addTrackPutInfo(railwayMap.trackMap.get(cPos));
                         }
                     }
                 }
-            }
-        }*/
+        }
+        if (!Config.useTrackSpawnerPlaceTrack) {
+            // 咱就是说，能不能把文件编码改成UTF-8？IDEA一打开就是乱码
+            // 抱歉，似乎我的IDEA一开始就是GBK编码 :-( 确实不想再改了
 
-        // 咱就是说，能不能把文件编码改成UTF-8？IDEA一打开就是乱码
-        // 放置铁轨
-        if (builder.regionRailways.containsKey(regionPos) && railwayMap.trackMap.containsKey(cPos)) {
-            List<TrackPutInfo> tracks = railwayMap.trackMap.get(cPos);
-            tracks.forEach(track -> {
-                if (track.bezier() != null) {
-                    if (Math.abs(track.bezier().endOffset().y) > 15){
-                        Tongdarailway.LOGGER.warn("Railway track height offset is too large. Generation Failed at" + track.pos().toString());
-                        return;
+            // 放置铁轨
+            if (builder.regionRailways.containsKey(regionPos) && railwayMap.trackMap.containsKey(cPos)) {
+                List<TrackPutInfo> tracks = railwayMap.trackMap.get(cPos);
+                tracks.forEach(track -> {
+                    if (track.bezier() != null) {
+                        if (Math.abs(track.bezier().endOffset().y) > 15){
+                            Tongdarailway.LOGGER.warn("Railway track height offset is too large. Generation Failed at" + track.pos().toString());
+                            return;
+                        }
+                        placeCurveTrack(world, track);
+                    } else {
+                        if (!world.getBlockState(track.pos()).is(AllBlocks.TRACK)) {
+                            world.setBlock(track.pos(), AllBlocks.TRACK.getDefaultState().setValue(TrackBlock.SHAPE, track.shape()), 3);
+                        }
                     }
-                    placeCurveTrack(world, track);
-                } else {
-                    if (!world.getBlockState(track.pos()).is(AllBlocks.TRACK)) {
-                        world.setBlock(track.pos(), AllBlocks.TRACK.getDefaultState().setValue(TrackBlock.SHAPE, track.shape()), 3);
-                    }
-                }
-            });
+                });
+            }
         }
 
         return true;
