@@ -196,7 +196,7 @@ public class RoutePlanner {
         // 转换为世界坐标系
         List<Vec3> path0 = new ArrayList<>();
 
-        for (int i = 1; i < path.size() - 1; i++) {
+        for (int i = 2; i < path.size() - 2; i++) {
             int[] point = path.get(i);
             path0.add(MyMth.inRegionPos2WorldPos(
                     regionPos,
@@ -251,9 +251,17 @@ public class RoutePlanner {
                 }
                 j--;
             }
-            // 未检查到，只能直接强行连接下一个
-            Vec3 endPos = path0.get(i + 1);
-            Vec3 endDir = path0.get(i+1).subtract(path0.get(i)).multiply(1,0,1).normalize();
+            // 未检查到，只能直接强行连接
+            Vec3 endPos;
+            Vec3 endDir;
+            if (i + 1 == path0.size() - 1) {
+                endPos = path0.get(i + 1);
+                endDir = path0.get(i + 1).subtract(path0.get(i)).multiply(1,0,1).normalize();
+            } else {
+                endPos = path0.get(i + 2);
+                endDir = path0.get(i + 2).subtract(path0.get(i + 1)).multiply(1,0,1).normalize();
+                i++;
+            }
             if (startPos.y == endPos.y && startDir.dot(endDir) > 0.9999 && startDir.dot(endPos.subtract(startPos).normalize()) > 0.9999) {
                 result.addLine(startPos, endPos);
             } else {
