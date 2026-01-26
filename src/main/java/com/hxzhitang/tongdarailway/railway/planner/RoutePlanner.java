@@ -432,7 +432,7 @@ public class RoutePlanner {
 
         // 车站起点连接
         Vec3 pA = con.start().add(con.startDir().scale(30)).add(con.exitDir().scale(25));
-        pA = new Vec3(pA.x(), (int)((con.start().y+path1.getFirst().y)/2), pA.z());
+        pA = new Vec3(pA.x(), (int) path1.getFirst().y, pA.z());
         result.addBezier(con.start(), con.startDir(), pA.subtract(con.start()), con.exitDir().reverse());
 
         path1.addFirst(pA);
@@ -492,7 +492,7 @@ public class RoutePlanner {
 
         // 终点车站连接
         Vec3 pB = con.end().add(con.endDir().scale(30)).add(con.exitDir().reverse().scale(25));
-        pB = new Vec3(pB.x(), (int)((con.end().y+last.y)/2), pB.z());
+        pB = new Vec3(pB.x(), (int) last.y, pB.z());
         result.connectWay(last, pB, startDir, con.exitDir().reverse(), false);
 
         result.addBezier(pB, con.exitDir(), con.end().subtract(pB), con.endDir());
