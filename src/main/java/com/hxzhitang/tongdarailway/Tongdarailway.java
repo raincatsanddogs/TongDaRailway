@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 缺区块 558 78 1054
 结构避让测试: -1031 73 328 | -769 159 5503
 车站连接 -1351 160 3034
+-3568 76 3507
 
 种子 216126112278392742
 -960 63 1424
@@ -49,7 +50,7 @@ public class Tongdarailway {
 
     // Mod常量
     public static final int CHUNK_GROUP_SIZE = 128;  // 一个路线生成区域的大小
-    public static final int HEIGHT_MAX_INCREMENT = 60;  // 路线生成最大高度相对于海平面的增量
+    public static final int HEIGHT_MAX_INCREMENT = 100;  // 路线生成最大高度相对于海平面的增量
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.

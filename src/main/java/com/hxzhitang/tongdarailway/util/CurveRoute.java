@@ -1,10 +1,6 @@
 package com.hxzhitang.tongdarailway.util;
 
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.math.VecHelper;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;

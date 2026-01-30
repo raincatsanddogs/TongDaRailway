@@ -1,7 +1,6 @@
 package com.hxzhitang.tongdarailway.structure;
 
 import net.minecraft.nbt.*;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.nio.file.Path;

@@ -210,7 +210,7 @@ public class RoutePlanner {
         List<int[]> handledHeightWay = handleHeight(way, level, costMap, connectionGenInfo);
         // 结果转为中心图坐标系
         handledHeightWay = handledHeightWay.stream().map(AStarPathfinder::pic2RegionPos).toList();
-        return connectTrackNew2(handledHeightWay, connectionGenInfo);
+        return connectTrackNew3(handledHeightWay, connectionGenInfo);
     }
 
     /**
@@ -295,13 +295,11 @@ public class RoutePlanner {
      * @param path 路线的端点
      * @return 连接后的复合曲线
      */
-    private ResultWay connectTrackNewTest(List<int[]> path, StationPlanner.ConnectionGenInfo con) {
-        int scale = 8/samplingNum;
-
+    private ResultWay connectTrackNew3(List<int[]> path, StationPlanner.ConnectionGenInfo con) {
         // 转换为世界坐标系
         List<Vec3> path0 = new ArrayList<>();
 
-        for (int i = 2; i < path.size() - 2; i++) {
+        for (int i = 0; i < path.size() - 2; i++) {
             int[] point = path.get(i);
             path0.add(MyMth.inRegionPos2WorldPos(
                     regionPos,
@@ -310,89 +308,76 @@ public class RoutePlanner {
             ));
         }
 
-        ResultWay result = new ResultWay(new CurveRoute(), new ArrayList<>());
+        List<Vec3> path1 = new ArrayList<>();
+        for (int i = 1; i < path0.size()-10; i+=6) {
+            path1.add(path0.get(i));
+        }
 
         // 连接线路和车站
-//        Vec3 last = path1.getLast();
+        Vec3 last = path1.getLast();
+
+        ResultWay result = new ResultWay(new CurveRoute(), new ArrayList<>());
 
         // 车站起点连接
-        Vec3 pA = con.start().add(con.startDir().scale(30)).add(con.exitDir().scale(30));
-        if (con.startDir().dot(con.exitDir()) > 0.999) {
-            result.addLine(con.start(), pA);
-        } else {
-            result.connectWay(con.start(), pA, con.startDir(), con.exitDir().reverse(), true);
+        Vec3 pA = con.start().add(con.startDir().scale(30)).add(con.exitDir().scale(25));
+        pA = new Vec3(pA.x(), (int) path1.getFirst().y, pA.z());
+        result.addBezier(con.start(), con.startDir(), pA.subtract(con.start()), con.exitDir().reverse());
+
+        Vec3 pB = con.end().add(con.endDir().scale(30)).add(con.exitDir().reverse().scale(25));
+        pB = new Vec3(pB.x(), (int) last.y, pB.z());
+
+        path1.addFirst(pA);
+        path1.addLast(pB);
+
+        Vec3 startDir = con.exitDir();
+        Vec3 endDir;
+        for (int i = 0; i < path1.size() - 1; i++) {
+            Vec3 start = path1.get(i);
+            Vec3 end = path1.get(i + 1);
+
+            endDir = MyMth.get8Dir(end.subtract(start)).reverse();
+            if (i == path1.size() - 2) // 处理和终点的连接
+                endDir = con.exitDir().reverse();
+
+            if (ResultWay.getConnect(BlockPos.containing(start.multiply(1,0,1)), BlockPos.containing(end.multiply(1,0,1)), startDir, endDir, false) != null) {
+                Vec3 dir = end.subtract(start).multiply(1, 0, 1).normalize();
+                double dot2 = startDir.dot(endDir.reverse());
+                double dot1 = startDir.dot(dir);
+                if (Mth.equal(dot1, 1) && Mth.equal(dot2, 1))
+                    result.addBezier(start, startDir, end.subtract(start), endDir);
+                else
+                    result.connectWay(start, end, startDir, endDir, start.y == end.y);
+            } else {
+                int len = (int) (start.distanceTo(end) / 2) - 2;
+                Vec3 aPos = (start.add(startDir.scale(len)).add(end.add(endDir.scale(len)))).scale(0.5);
+                aPos = new Vec3((int) aPos.x(), (int) aPos.y(), (int) aPos.z());
+                Vec3 aDir;
+                Vec3 d = aPos.subtract(start).multiply(1, 0, 1).normalize();
+                double dot = startDir.dot(d);
+                double cross = startDir.x * d.z - startDir.z * d.x;
+                boolean maximiseTurn = start.y == end.y;
+
+                if (Mth.equal(dot, 1)) {
+                    // 前方 直线
+                    aDir = startDir;
+                    result.addBezier(start, startDir, aPos.subtract(start), aDir.reverse());
+                    result.addBezier(aPos, aDir, end.subtract(aPos), endDir);
+                    continue;
+                } else if (dot > 0.78) {
+                    // 斜前方 135度钝角
+                    aDir = MyMth.rotateAroundY(startDir, cross, 45);
+                } else {
+                    // 侧前方 90度直角
+                    aDir = MyMth.rotateAroundY(startDir, cross, 90);
+                }
+                result.connectWay(start, aPos, startDir, aDir.reverse(), maximiseTurn);
+                result.connectWay(aPos, end, aDir, endDir, maximiseTurn);
+            }
+            startDir = endDir.reverse();
         }
-
-
-        // 连出站...
-
-
-
-        for (int i = 1; i < path0.size() - 1; i++) {
-            Vec3 bakPos = path0.get(i-1);
-            Vec3 thisPos = path0.get(i);
-            Vec3 nextPos = path0.get(i+1);
-
-            Vec3 nextDir = nextPos.subtract(thisPos).multiply(1,0,1).normalize();
-            Vec3 backDir = thisPos.subtract(bakPos).multiply(1,0,1).normalize();
-
-            int sdx = MyMth.splitFunc(backDir.x) * scale;
-            int sdz = MyMth.splitFunc(backDir.z) * scale;
-
-            int edx = MyMth.splitFunc(nextDir.x) * scale;
-            int edz = MyMth.splitFunc(nextDir.z) * scale;
-
-            Vec3 cons = new Vec3(thisPos.x-sdx, thisPos.y, thisPos.z-sdz);
-            Vec3 cone = new Vec3(thisPos.x+edx, nextPos.y, thisPos.z+edz);
-
-            result.addBezier(cons, backDir, cone.subtract(cons), nextDir.reverse());
-        }
-
-//        Vec3 startPos = path0.getFirst();
-//        Vec3 startDir = con.exitDir();
-
-//        int len = 0;
-//        int turn = 0;
-//        for (int i = 1; i < path0.size() - 1; i++) {
-//            Vec3 thisPos = path0.get(i);
-//
-//            Vec3 bakDir = thisPos.subtract(path0.get(i-1)).multiply(1,0,1).normalize();
-//            Vec3 forDir = path0.get(i+1).subtract(thisPos).multiply(1,0,1).normalize();
-//
-//            if (bakDir.dot(forDir) < 0.9999) {
-//                turn++;
-//            }
-//            len++;
-//
-//            // 连接一次
-//            if (turn > 0 || len > 5) {
-//                int sdx = MyMth.splitFunc(startDir.x) * scale;
-//                int sdz = MyMth.splitFunc(startDir.z) * scale;
-//
-//                int edx = MyMth.splitFunc(forDir.x) * scale;
-//                int edz = MyMth.splitFunc(forDir.z) * scale;
-//
-//                Vec3 cons = new Vec3(startPos.x+sdx, startPos.y, startPos.z+sdz);
-//                Vec3 cone = new Vec3(thisPos.x+edx, thisPos.y, thisPos.z+edz);
-//
-//                result.addBezier(cons, startDir, cone.subtract(cons), forDir.reverse());
-//
-//                len = 0;
-//                turn = 0;
-//
-//                startPos = thisPos;
-//                startDir = forDir;
-//            }
-//        }
 
         // 终点车站连接
-        Vec3 pB = con.end().add(con.endDir().scale(30)).add(con.exitDir().reverse().scale(30));
-//        result.connectWay(last, pB, startDir, con.exitDir().reverse(), false);
-        if (con.endDir().dot(con.exitDir().reverse()) > 0.999) {
-            result.addLine(pB, con.end());
-        } else {
-            result.connectWay(pB, con.end(), con.exitDir(), con.endDir(), true);
-        }
+        result.addBezier(pB, con.exitDir(), con.end().subtract(pB), con.endDir());
 
         return result;
     }
@@ -771,7 +756,7 @@ public class RoutePlanner {
         }
 
         public void addBezier(Vec3 start, Vec3 startDir, Vec3 endOffset, Vec3 endDir) {
-            if (Math.abs(startDir.dot(endDir)) > 0.9999 && startDir.dot(endOffset.normalize()) > 0.9999 && endOffset.y == 0) {
+            if (Mth.equal(Math.abs(startDir.dot(endDir)), 1) && Mth.equal(startDir.dot(endOffset.normalize()), 1) && endOffset.y == 0) {
                 Vec3 end = start.add(endOffset);
                 way.addSegment(new CurveRoute.LineSegment(start, end));
                 int n = Math.max((int) Math.abs(start.x - end.x), (int) Math.abs(start.z - end.z));
