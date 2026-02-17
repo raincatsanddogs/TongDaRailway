@@ -21,18 +21,18 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 
 /*
-ï¿½ï¿½ï¿½ï¿½ -4301944397657168414
+ÖÖ×Ó -4301944397657168414
 -684 131 1547
-È±ï¿½ï¿½ï¿½ï¿½ 558 78 1054
-ï¿½á¹¹ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½: -1031 73 328 | -769 159 5503
-ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ -1351 160 3034
+È±Çø¿é 558 78 1054
+½á¹¹±ÜÈÃ²âÊÔ: -1031 73 328 | -769 159 5503
+³µÕ¾Á¬½Ó -1351 160 3034
 -3568 76 3507
 
-ï¿½ï¿½ï¿½ï¿½ 216126112278392742
+ÖÖ×Ó 216126112278392742
 -960 63 1424
-[x] ï¿½Ô½ï¿½ï¿½ß¶ï¿½È±Ê§ 1839 85 959
-[x] ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ 1341 76 884
-[-] ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Õ¾ 621 64 3478
+[x] ¶Ô½ÇÏß¶ÎÈ±Ê§ 1839 85 959
+[x] µ÷Æ½²»¹¤×÷/´íÎóµÄÎ´Éý½µµÄÖ±Ïß 1341 76 884
+[-] ²»´íµÄ³µÕ¾ 621 64 3478
 
 -6630103939123469904
 -560 71 3184
@@ -52,9 +52,9 @@ public class Tongdarailway {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // Modï¿½ï¿½ï¿½ï¿½
-    public static volatile int CHUNK_GROUP_SIZE = 128;  // Ò»ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½Ð¡ ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½
-    public static final int HEIGHT_MAX_INCREMENT = 60;  // Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¶ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // Mod³£Á¿
+    public static volatile int CHUNK_GROUP_SIZE = 128;  // Ò»¸öÂ·ÏßÉú³ÉÇøÓòµÄ´óÐ¡ ¿ÉÍ¨¹ýÅäÖÃÎÄ¼þµ÷Õû
+    public static final int HEIGHT_MAX_INCREMENT = 60;  // Â·ÏßÉú³É×î´ó¸ß¶ÈÏà¶ÔÓÚº£Æ½ÃæµÄÔöÁ¿
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -96,7 +96,7 @@ public class Tongdarailway {
             // Some client setup code
 
             event.enqueueWork(() -> {
-                // ×¢ï¿½á·½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½
+                // ×¢²á·½¿éÊµÌåäÖÈ¾Æ÷
                 BlockEntityRenderers.register(ModBlockEntities.TRACK_SPAWNER.get(), TrackSpawnerBlockRenderer::new);
             });
         }
