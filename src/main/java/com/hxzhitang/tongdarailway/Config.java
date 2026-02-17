@@ -23,16 +23,23 @@ public class Config {
             .comment("Use the track spawner,(true) or place rails during world generation.(false)")
             .define("placeTracksUsingTrackSpawner", true);
 
+    private static final ModConfigSpec.IntValue CHUNK_GROUP_SIZE = BUILDER
+            .comment("Size of each railway region in chunks. Smaller values increase station density. (default: 128, min: 32, max: 256)")
+            .defineInRange("chunkGroupSize", 128, 32, 256);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean enableTrackSpawner;
     public static boolean generateTrackSpawner;
     public static boolean useTrackSpawnerPlaceTrack;
+    public static int chunkGroupSize;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         enableTrackSpawner = ENABLE_TRACK_SPAWNER.get();
         generateTrackSpawner = GENERATE_TRACK_SPAWNER.get();
         useTrackSpawnerPlaceTrack = PLACE_TRACKS_USING_TRACK_SPAWNER.get();
+        chunkGroupSize = CHUNK_GROUP_SIZE.get();
+        Tongdarailway.CHUNK_GROUP_SIZE = chunkGroupSize;
     }
 }
