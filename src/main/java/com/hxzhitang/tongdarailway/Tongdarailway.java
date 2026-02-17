@@ -53,7 +53,7 @@ public class Tongdarailway {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     // Mod常量
-    public static final int CHUNK_GROUP_SIZE = 128;  // 一个路线生成区域的大小
+    public static volatile int CHUNK_GROUP_SIZE = 128;  // 一个路线生成区域的大小 可通过配置文件调整
     public static final int HEIGHT_MAX_INCREMENT = 60;  // 路线生成最大高度相对于海平面的增量
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
